@@ -1,25 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
+import KanbanBoard from "./kanban/KanbanBoard";
+import DndContext from "./lib/dnd/DndContext";
+import Dnd from "./lib/dnd/DndContext";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Grid2
+      sx={{
+        userSelect : 'none'
+      }}
+      width={900}
+    >
+      <Dnd />
+    </Grid2>
   );
 }
 

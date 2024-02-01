@@ -29,7 +29,9 @@ export default function KanbanList({
         <Stack
             width={250}
         >
-            <Card>
+            <Card
+                sx={{background : 'rgba(255,255,255,0.5)'}}
+            >
                 <CardContent>
                     <Typography>
                         {itemList.name}

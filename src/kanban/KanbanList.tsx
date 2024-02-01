@@ -31,10 +31,10 @@ export default function KanbanList({
             width={250}
         >
             <Card>
-                <Typography>
-                    {itemList.name}
-                </Typography>
                 <CardContent>
+                    <Typography>
+                        {itemList.name}
+                    </Typography>
                     <SortableContext
                         key={id}
                         id={id}

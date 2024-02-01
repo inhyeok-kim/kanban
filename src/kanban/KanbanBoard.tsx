@@ -6,7 +6,8 @@ import {
   KeyboardSensor,
   PointerSensor,
   useSensor,
-  useSensors
+  useSensors,
+  MouseSensor
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
@@ -27,7 +28,11 @@ export default function Board() {
   const [activeItem, setActiveId] = useState();
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(MouseSensor,{
+        activationConstraint : {
+            distance : 5,
+        }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates
     })

@@ -1,11 +1,13 @@
-import { Button, Card, CardActions, CardContent, CardHeader, Stack } from "@mui/material";
-import { blueGrey } from "@mui/material/colors";
-import { Draggable, Droppable } from "react-beautiful-dnd";
-import KanbanCard, { KanbanCardData } from "./KanbanCard";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import SortableContainer from "../lib/dndkit/SortableContainer"
+import KanbanCard, { KanbanCardData } from "./KanbanCard"
+import { useDroppable } from "@dnd-kit/core";
+import { Card, CardContent, Stack, Typography } from "@mui/material";
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 
 export interface KanbanListOption {
     itemList : KanbanListData
-    index : number
+    // index : number
 }
 
 export interface KanbanListData {
@@ -16,71 +18,40 @@ export interface KanbanListData {
 
 export default function KanbanList({
     itemList
-    ,index
+    // ,index
 } : KanbanListOption){
+    const { id, items } = itemList;
 
+    const { setNodeRef } = useDroppable({
+      id
+    });
+  
     return (
-        <Draggable
-            draggableId={itemList.id} 
-            index={index}
+        <Stack
+            width={250}
         >
-            {(provided, snapshot) => (
-                <div 
-                    key={itemList.id}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                >
-                    <Card
-                        sx={{
-                            margin:0.5,
-                            background:blueGrey[200]
-                        }}
+            <Card>
+                <Typography>
+                    {itemList.name}
+                </Typography>
+                <CardContent>
+                    <SortableContext
+                        key={id}
+                        id={id}
+                        items={items}
+                        strategy={verticalListSortingStrategy}
                     >
-                        <CardHeader
-                            title={itemList.name}
-                            titleTypographyProps={{fontSize:'1rem'}}
-
-                        />
-                        <CardContent
-                            sx={{padding : 0}}
+                        <Grid2 
+                            ref={setNodeRef}
+                            minHeight={60}
                         >
-                            <Droppable
-                                droppableId={`${index}`}
-                                key={`${index}`}
-                                type="task"
-                            >
-                                {(provided, snapshot) => (
-                                    <div 
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}    
-                                    >
-                                        <Stack 
-                                            // spacing={1}
-                                            justifyContent={'flex-start'}
-                                            width={250}
-                                            padding={1}
-                                            margin={0.5}
-                                        >
-                                            {itemList.items.map((item,index)=>(
-                                                item?
-                                                <KanbanCard key={item.id} item={item as KanbanCardData} index={index} />
-                                                :''
-                                            ))}
-                                            
-                                            {provided.placeholder}
-                                        </Stack>
-                                    </div>
-                                )}
-                            </Droppable>
-                        </CardContent>
-                        <CardActions>
-                            <Button>New</Button>
-                        </CardActions>
-                    </Card>
-            </div>
-        )}
-    </Draggable>
-    )
-}
-
+                            {items.map((item : any) => (
+                                <KanbanCard key={item.id} item={item} />
+                            ))}
+                        </Grid2>
+                    </SortableContext>
+                </CardContent>
+            </Card>
+        </Stack>
+    );
+  }

@@ -10,8 +10,9 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
-import KanbanList from "./KanbanList";
-import KanbanCard from "./KanbanCard";
+import SortableContainer from "./SortableContainer";
+import Item from "./Item";
+
 const wrapperStyle = {
   display: "flex",
   flexDirection: "row"
@@ -19,12 +20,12 @@ const wrapperStyle = {
 
 export default function Board() {
   const [items, setItems] = useState({
-    'T1': {id : 'T1', name:'대기',items : [{id:"a1",content:'a1'}, {id:"a2",content:'a2'}, {id:"a3",content:'a3'}]},
-    'T2': {id : 'T2', name:'진행',items : [{id:"b1",content:'b1'}, {id:"b2",content:'b2'}, {id:"b3",content:'b3'}]},
-    'T3': {id : 'T3', name:'완료',items : [{id:"c1",content:'c1'}, {id:"c2",content:'c2'}, {id:"c3",content:'c3'}]},
-    'T4': {id : 'T4', name:'취소',items : [{id:"d1",content:'d1'}, {id:"d2",content:'d2'}, {id:"d3",content:'d3'}]},
-  } as {[index : string] : any});
-  const [activeItem, setActiveId] = useState();
+    root: ["1", "2", "3"],
+    container1: ["4", "5", "6"],
+    container2: ["7", "8", "9"],
+    container3: []
+  } as {[index : string] : string[]});
+  const [activeId, setActiveId] = useState();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -43,10 +44,11 @@ export default function Board() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        {Object.keys(items).map((id : any)=>(
-            <KanbanList key={id} itemList={items[id]} />
-        ))}
-        <DragOverlay>{activeItem ? <KanbanCard item={activeItem} /> : null}</DragOverlay>
+        <SortableContainer id="root" items={items.root} />
+        <SortableContainer id="container1" items={items.container1} />
+        <SortableContainer id="container2" items={items.container2} />
+        <SortableContainer id="container3" items={items.container3} />
+        <DragOverlay>{activeId ? <Item id={activeId} /> : null}</DragOverlay>
       </DndContext>
     </div>
   );
@@ -56,15 +58,14 @@ export default function Board() {
       return id;
     }
 
-    return Object.keys(items).find((key) => items[key].items.find((item : any)=>item.id==id));
+    return Object.keys(items).find((key) => items[key].includes(id));
   }
 
   function handleDragStart(event : any) {
     const { active } = event;
-    const { data } = active;
-    
-    
-    setActiveId(data.current);
+    const { id } = active;
+
+    setActiveId(id);
   }
 
   function handleDragOver(event : any) {
@@ -85,13 +86,13 @@ export default function Board() {
     }
 
     setItems((prev) => {
-      const activeItems = prev[activeContainer].items;
-      const overItems = prev[overContainer].items;
+      const activeItems = prev[activeContainer];
+      const overItems = prev[overContainer];
 
       // Find the indexes for the items
-      const activeIndex = activeItems.findIndex((item : any)=>item.id === id);
-      const overIndex = overItems.findIndex((item : any)=>item.id === overId);
-      
+      const activeIndex = activeItems.indexOf(id);
+      const overIndex = overItems.indexOf(overId);
+
       let newIndex;
       if (overId in prev) {
         // We're at the root droppable of a container
@@ -109,18 +110,14 @@ export default function Board() {
 
       return {
         ...prev,
-        [activeContainer]: {
-            id : prev[activeContainer].id,
-            name : prev[activeContainer].name,
-            items : [...prev[activeContainer].items.filter((item : any) => item.id !== active.id)]
-        },
-        [overContainer]: {
-            id : prev[overContainer].id,
-            name : prev[overContainer].name,
-            items : [...prev[overContainer].items.slice(0, newIndex),
-            items[activeContainer].items[activeIndex],
-            ...prev[overContainer].items.slice(newIndex, prev[overContainer].length)]
-        }
+        [activeContainer]: [
+          ...prev[activeContainer].filter((item) => item !== active.id)
+        ],
+        [overContainer]: [
+          ...prev[overContainer].slice(0, newIndex),
+          items[activeContainer][activeIndex],
+          ...prev[overContainer].slice(newIndex, prev[overContainer].length)
+        ]
       };
     });
   }
@@ -141,17 +138,13 @@ export default function Board() {
       return;
     }
 
-    const activeIndex = items[activeContainer].items.findIndex((item : any)=>item.id === active.id);
-    const overIndex = items[overContainer].items.findIndex((item : any)=>item.id === overId);
+    const activeIndex = items[activeContainer].indexOf(active.id);
+    const overIndex = items[overContainer].indexOf(overId);
 
     if (activeIndex !== overIndex) {
       setItems((items) => ({
         ...items,
-        [overContainer]: {
-            id : items[activeContainer].id,
-            name : items[activeContainer].name,
-            items : arrayMove(items[overContainer].items, activeIndex, overIndex)
-        }
+        [overContainer]: arrayMove(items[overContainer], activeIndex, overIndex)
       }));
     }
 

@@ -1,44 +1,47 @@
-import { Button, Card, CardActions, CardContent } from "@mui/material";
-import { memo } from "react";
-import { Draggable } from "react-beautiful-dnd";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Card, CardContent } from "@mui/material";
+import { useEffect } from "react";
 
 export interface KanbanCardOption {
     item : KanbanCardData
-    index : number
 }
 
 export interface KanbanCardData {
     id : string,
-    title : string
+    content : string
 }
 
-export default memo(function KanbanCard({
+export default function KanbanCard({
     item
-    ,index
 } : KanbanCardOption){
 
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: item.id, data : item });
+    
+    const style = {
+        margin : '5px',
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0 : 1,
+    };
+
+    useEffect(()=>{
+    },[isDragging]);
+    
     return (
-        <Draggable
-            key={item.id} 
-            draggableId={item.id} 
-            index={index}
-        >
-            {(provided, snapshot) => (
-                <div 
-                    key={item.id}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                >
-                    <Card
-                        sx={{margin:0.5}}
-                    >
-                        <CardContent>
-                            {item.title}
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
-        </Draggable>
-    )
-});
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            <Card>
+                <CardContent>
+                    {item.content}
+                </CardContent>
+            </Card>
+        </div>
+    );
+};

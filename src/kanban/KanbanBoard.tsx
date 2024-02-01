@@ -4,7 +4,6 @@ import {
   DragOverlay,
   closestCorners,
   KeyboardSensor,
-  PointerSensor,
   useSensor,
   useSensors,
   MouseSensor
@@ -13,6 +12,8 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import KanbanList from "./KanbanList";
 import KanbanCard from "./KanbanCard";
+import { Stack } from "@mui/material";
+
 const wrapperStyle = {
   display: "flex",
   flexDirection: "row"
@@ -48,9 +49,14 @@ export default function Board() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        {Object.keys(items).map((id : any)=>(
-            <KanbanList key={id} itemList={items[id]} />
-        ))}
+        <Stack
+          direction={"row"}
+          spacing={2}
+        >
+          {Object.keys(items).map((id : any)=>(
+              <KanbanList key={id} itemList={items[id]} />
+          ))}
+        </Stack>
         <DragOverlay>{activeItem ? <KanbanCard item={activeItem} /> : null}</DragOverlay>
       </DndContext>
     </div>
@@ -61,7 +67,7 @@ export default function Board() {
       return id;
     }
 
-    return Object.keys(items).find((key) => items[key].items.find((item : any)=>item.id==id));
+    return Object.keys(items).find((key) => items[key].items.find((item : any)=>item.id===id));
   }
 
   function handleDragStart(event : any) {
@@ -73,7 +79,7 @@ export default function Board() {
   }
 
   function handleDragOver(event : any) {
-    const { active, over, draggingRect } = event;
+    const { active, over } = event;
     const { id } = active;
     const { id: overId } = over;
 

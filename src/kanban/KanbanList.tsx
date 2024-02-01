@@ -1,5 +1,4 @@
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import SortableContainer from "../lib/dndkit/SortableContainer"
 import KanbanCard, { KanbanCardData } from "./KanbanCard"
 import { useDroppable } from "@dnd-kit/core";
 import { Card, CardContent, Stack, Typography } from "@mui/material";

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -14,30 +14,34 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import KanbanList from "./KanbanList";
 import KanbanCard from "./KanbanCard";
 import { Stack } from "@mui/material";
-import { Column, DB, Task } from "../lib/db/db";
+import { Column, DB, Task } from "../../lib/db/db";
+import { createKanbanCard, selectKanbanData, reorderTask, deleteKanbanCard } from "../service/KanbanService";
+
+export const BoardContext = createContext<BoardContext>({
+  createNewCard : ()=>{},
+  deleteCard : ()=>{}
+});
+export interface BoardContext {
+  createNewCard : Function
+  deleteCard : Function
+}
 
 export interface BoardData {
   [index : string | number] : Column
 }
 
 export default function Board() {
-  const [items, setItems] = useState({
-  } as BoardData);
+  const [items, setItems] = useState({} as BoardData);
 
   useEffect(()=>{
-    initBoardData();
+    loadBoardData();
   },[]);
-  useEffect(()=>{
-    // console.log(items);
-  },[items]);
 
-  async function initBoardData(){
+  async function loadBoardData(){
     const data : BoardData = {};
-    const columns : Column[] = await DB.columns.toArray();
-    for(let i=0; i < columns.length; i++){
-      const column = columns[i];
-      const tasks = await DB.tasks.filter(task=>task.columnId === column.id).toArray();
-      column.items = tasks;
+    const list = await selectKanbanData();
+    for(let i=0; i < list.length; i++){
+      const column = list[i];
       data["Col"+column.id!] = column;
     }
     setItems(data);
@@ -51,30 +55,43 @@ export default function Board() {
             distance : 5,
         }
     }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
-    })
+    // useSensor(KeyboardSensor, {
+    //   coordinateGetter: sortableKeyboardCoordinates
+    // })
   );
 
+  async function createNewCard(colId : string){
+    const id = parseInt(colId.replace('Col',''));
+    await createKanbanCard(id);
+    loadBoardData();
+  }
+
+  async function deleteCard(item : Task){
+    await deleteKanbanCard(item);
+    loadBoardData();
+  }
+
   return (
-    <DndContext
-      // announcements={defaultAnnouncements}
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <Stack
-        direction={"row"}
-        spacing={2}
+    <BoardContext.Provider value={{createNewCard, deleteCard}}>
+      <DndContext
+        // announcements={defaultAnnouncements}
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
       >
-        {Object.keys(items).map((id : any)=>(
-            <KanbanList key={"Col"+id} itemList={items[id]} />
-        ))}
-      </Stack>
-      <DragOverlay>{activeItem ? <KanbanCard item={activeItem} /> : null}</DragOverlay>
-    </DndContext>
+        <Stack
+          direction={"row"}
+          spacing={2}
+        >
+          {Object.keys(items).map((id : any)=>(
+              <KanbanList key={"Col"+id} itemList={items[id]} />
+          ))}
+        </Stack>
+        <DragOverlay>{activeItem ? <KanbanCard item={activeItem} /> : null}</DragOverlay>
+      </DndContext>
+    </BoardContext.Provider>
   );
 
   function findContainer(id : any) {
@@ -88,7 +105,6 @@ export default function Board() {
   function handleDragStart(event : any) {
     const { active } = event;
     const { data } = active;
-    
     
     setActiveId(data.current);
   }
@@ -168,17 +184,24 @@ export default function Board() {
 
     const activeIndex = items[activeContainer].items!.findIndex((item : Task)=>item.id === active.id);
     const overIndex = items[overContainer].items!.findIndex((item : Task)=>item.id === overId);
-
+    let newItems = items;
     if (activeIndex !== overIndex) {
-      setItems((items) => ({
+      newItems = {
         ...items,
         [overContainer]: {
             id : items[activeContainer].id,
             name : items[activeContainer].name,
             items : arrayMove(items[overContainer].items!, activeIndex, overIndex)
         }
-      }));
+      };
+      setItems(newItems);
     }
+    newItems[activeContainer].items?.forEach((item,index)=>{
+      const updt = {...item};
+      updt.columnId = newItems[activeContainer].id!;
+      updt.order = index;
+      reorderTask(updt);
+    });
 
     //@ts-ignore
     setActiveId(null);

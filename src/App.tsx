@@ -1,8 +1,7 @@
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import KanbanBoard from "./kanban/KanbanBoard";
+import KanbanBoard from "./kanban/view/KanbanBoard";
 import { Button, Stack } from "@mui/material";
 import { blueGrey } from "@mui/material/colors";
-import { url } from "inspector";
 
 function App() {
   return (

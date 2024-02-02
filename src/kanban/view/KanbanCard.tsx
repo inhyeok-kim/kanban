@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Card, CardContent, CardHeader, IconButton } from "@mui/material";
+import { Button, Card, CardActionArea, CardContent, CardHeader, Drawer, IconButton } from "@mui/material";
 import { useContext, useEffect } from "react";
 import { Task } from "../../lib/db/db";
 import CardTitle from "./CardTitle";
@@ -45,7 +45,7 @@ export default function KanbanCard({
     function deleteCard(){
         boardContext.deleteCard(item);
     }
-    
+
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
             <Card>
@@ -60,11 +60,15 @@ export default function KanbanCard({
                     action={<IconButton size="small" onClick={deleteCard}>-</IconButton>}
                     sx={{paddingBottom:0, padding:1}}
                 />
-                <CardContent
-                    sx={{paddingTop:0}}
+                <CardActionArea
+                    onClick={()=>{boardContext.openDrawer(item)}}
                 >
-                    
-                </CardContent>
+                    <CardContent
+                        sx={{paddingTop:0}}
+                    >
+                        
+                    </CardContent>
+                </CardActionArea>
             </Card>
         </div>
     );

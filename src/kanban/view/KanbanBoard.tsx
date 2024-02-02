@@ -13,17 +13,20 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import KanbanList from "./KanbanList";
 import KanbanCard from "./KanbanCard";
-import { Stack } from "@mui/material";
+import { Drawer, Stack } from "@mui/material";
 import { Column, DB, Task } from "../../lib/db/db";
 import { createKanbanCard, selectKanbanData, reorderTask, deleteKanbanCard } from "../service/KanbanService";
+import TaskDrawer from "./TaskDrawer";
 
 export const BoardContext = createContext<BoardContext>({
   createNewCard : ()=>{},
-  deleteCard : ()=>{}
+  deleteCard : ()=>{},
+  openDrawer : ()=>{}
 });
 export interface BoardContext {
   createNewCard : Function
   deleteCard : Function
+  openDrawer : Function
 }
 
 export interface BoardData {
@@ -32,6 +35,8 @@ export interface BoardData {
 
 export default function Board() {
   const [items, setItems] = useState({} as BoardData);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerItem, setDrawerItem] = useState<Task|null>(null);
 
   useEffect(()=>{
     loadBoardData();
@@ -71,8 +76,13 @@ export default function Board() {
     loadBoardData();
   }
 
+  function openDrawer(item : Task){
+    setDrawerOpen(true);
+    setDrawerItem(item);
+  }
+
   return (
-    <BoardContext.Provider value={{createNewCard, deleteCard}}>
+    <BoardContext.Provider value={{createNewCard, deleteCard, openDrawer}}>
       <DndContext
         // announcements={defaultAnnouncements}
         sensors={sensors}
@@ -91,6 +101,16 @@ export default function Board() {
         </Stack>
         <DragOverlay>{activeItem ? <KanbanCard item={activeItem} /> : null}</DragOverlay>
       </DndContext>
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={()=>{setDrawerOpen(false)}}
+      >
+        {drawerItem?
+          <TaskDrawer item={drawerItem} />
+          :''
+        }
+      </Drawer>
     </BoardContext.Provider>
   );
 

@@ -5,12 +5,14 @@ export class KanbanDatabase extends Dexie {
     columns! : Table<Column>;
     tasks! : Table<Task>;
     config! : Table<Config>;
+    workNote! : Table<WorkNote>;
 
     constructor(){
         super('kanban');
-        this.version(0.2).stores({
+        this.version(0.3).stores({
             columns : '++id, name',
             tasks : '++id, columnId, title, order',
+            workNote : '++id, taskId, date, content',
             config : 'key, value'
         });
     }
@@ -29,6 +31,12 @@ export interface Task {
     columnId? : number | string | IndexableType
     title : string
     order : number
+}
+export interface WorkNote {
+    id? : number
+    taskId? : number | string | IndexableType
+    content : string
+    date : string
 }
 
 export interface Config {

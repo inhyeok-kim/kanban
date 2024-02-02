@@ -1,4 +1,4 @@
-import { Column, DB, Task } from "../../lib/db/db";
+import { Column, DB, Task, WorkNote } from "../../lib/db/db";
 
 export async function selectKanbanData(){
     const columns : Column[] = await DB.columns.toArray();
@@ -26,4 +26,13 @@ export async function reorderTask(item : Task){
 
 export async function updateTitle(item : Task){
     DB.tasks.update(item.id!,{title : item.title});
+}
+
+export async function selectWorkNote(taskId : number){
+    const list = await DB.workNote.filter(note=>note.taskId === taskId).toArray();
+    return list;
+}
+
+export async function putWorkNote(workNote : WorkNote){
+    await DB.workNote.put(workNote);
 }

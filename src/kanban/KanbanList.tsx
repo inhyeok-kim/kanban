@@ -1,28 +1,22 @@
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import KanbanCard, { KanbanCardData } from "./KanbanCard"
+import KanbanCard from "./KanbanCard"
 import { useDroppable } from "@dnd-kit/core";
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
+import { Column } from "../lib/db/db";
 
 export interface KanbanListOption {
-    itemList : KanbanListData
-    // index : number
-}
-
-export interface KanbanListData {
-    id : string,
-    name : string,
-    items : KanbanCardData[]
+    itemList : Column
 }
 
 export default function KanbanList({
     itemList
-    // ,index
 } : KanbanListOption){
-    const { id, items } = itemList;
+    const id = "Col"+itemList.id!;
+    const items = itemList.items!;
 
     const { setNodeRef } = useDroppable({
-      id
+        id
     });
   
     return (
@@ -37,8 +31,8 @@ export default function KanbanList({
                         {itemList.name}
                     </Typography>
                     <SortableContext
-                        key={id}
                         id={id}
+                        //@ts-ignore
                         items={items}
                         strategy={verticalListSortingStrategy}
                     >
@@ -47,7 +41,7 @@ export default function KanbanList({
                             minHeight={60}
                         >
                             {items.map((item : any) => (
-                                <KanbanCard key={item.id} item={item} />
+                                <KanbanCard key={"Task"+item.id} item={item} />
                             ))}
                         </Grid2>
                     </SortableContext>

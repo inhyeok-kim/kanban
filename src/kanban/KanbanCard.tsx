@@ -2,14 +2,10 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent } from "@mui/material";
 import { useEffect } from "react";
+import { Task } from "../lib/db/db";
 
 export interface KanbanCardOption {
-    item : KanbanCardData
-}
-
-export interface KanbanCardData {
-    id : string,
-    content : string
+    item : Task
 }
 
 export default function KanbanCard({
@@ -23,7 +19,7 @@ export default function KanbanCard({
         transform,
         transition,
         isDragging
-    } = useSortable({ id: item.id, data : item });
+    } = useSortable({ id: item.id!, data : item });
     
     const style = {
         margin : '5px',
@@ -39,7 +35,7 @@ export default function KanbanCard({
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
             <Card>
                 <CardContent>
-                    {item.content}
+                    {item.title}
                 </CardContent>
             </Card>
         </div>

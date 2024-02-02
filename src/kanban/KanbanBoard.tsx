@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -6,26 +6,43 @@ import {
   KeyboardSensor,
   useSensor,
   useSensors,
-  MouseSensor
+  MouseSensor,
+  DragOverEvent
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import KanbanList from "./KanbanList";
 import KanbanCard from "./KanbanCard";
 import { Stack } from "@mui/material";
+import { Column, DB, Task } from "../lib/db/db";
 
-const wrapperStyle = {
-  display: "flex",
-  flexDirection: "row"
-};
+export interface BoardData {
+  [index : string | number] : Column
+}
 
 export default function Board() {
   const [items, setItems] = useState({
-    'T1': {id : 'T1', name:'대기',items : [{id:"a1",content:'a1'}, {id:"a2",content:'a2'}, {id:"a3",content:'a3'}]},
-    'T2': {id : 'T2', name:'진행',items : [{id:"b1",content:'b1'}, {id:"b2",content:'b2'}, {id:"b3",content:'b3'}]},
-    'T3': {id : 'T3', name:'완료',items : [{id:"c1",content:'c1'}, {id:"c2",content:'c2'}, {id:"c3",content:'c3'}]},
-    'T4': {id : 'T4', name:'취소',items : [{id:"d1",content:'d1'}, {id:"d2",content:'d2'}, {id:"d3",content:'d3'}]},
-  } as {[index : string] : any});
+  } as BoardData);
+
+  useEffect(()=>{
+    initBoardData();
+  },[]);
+  useEffect(()=>{
+    // console.log(items);
+  },[items]);
+
+  async function initBoardData(){
+    const data : BoardData = {};
+    const columns : Column[] = await DB.columns.toArray();
+    for(let i=0; i < columns.length; i++){
+      const column = columns[i];
+      const tasks = await DB.tasks.filter(task=>task.columnId === column.id).toArray();
+      column.items = tasks;
+      data["Col"+column.id!] = column;
+    }
+    setItems(data);
+  }
+  
   const [activeItem, setActiveId] = useState();
 
   const sensors = useSensors(
@@ -40,26 +57,24 @@ export default function Board() {
   );
 
   return (
-    <div style={wrapperStyle as React.CSSProperties}>
-      <DndContext
-        // announcements={defaultAnnouncements}
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
+    <DndContext
+      // announcements={defaultAnnouncements}
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
+      <Stack
+        direction={"row"}
+        spacing={2}
       >
-        <Stack
-          direction={"row"}
-          spacing={2}
-        >
-          {Object.keys(items).map((id : any)=>(
-              <KanbanList key={id} itemList={items[id]} />
-          ))}
-        </Stack>
-        <DragOverlay>{activeItem ? <KanbanCard item={activeItem} /> : null}</DragOverlay>
-      </DndContext>
-    </div>
+        {Object.keys(items).map((id : any)=>(
+            <KanbanList key={"Col"+id} itemList={items[id]} />
+        ))}
+      </Stack>
+      <DragOverlay>{activeItem ? <KanbanCard item={activeItem} /> : null}</DragOverlay>
+    </DndContext>
   );
 
   function findContainer(id : any) {
@@ -67,7 +82,7 @@ export default function Board() {
       return id;
     }
 
-    return Object.keys(items).find((key) => items[key].items.find((item : any)=>item.id===id));
+    return Object.keys(items).find((key) => items[key].items!.find((item : any)=>item.id===id));
   }
 
   function handleDragStart(event : any) {
@@ -78,11 +93,10 @@ export default function Board() {
     setActiveId(data.current);
   }
 
-  function handleDragOver(event : any) {
+  function handleDragOver(event : DragOverEvent) {
     const { active, over } = event;
     const { id } = active;
-    const { id: overId } = over;
-
+    const { id: overId } = over!;
     // Find the containers
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
@@ -96,12 +110,12 @@ export default function Board() {
     }
 
     setItems((prev) => {
-      const activeItems = prev[activeContainer].items;
-      const overItems = prev[overContainer].items;
+      const activeItems = prev[activeContainer].items!;
+      const overItems = prev[overContainer].items!;
 
       // Find the indexes for the items
-      const activeIndex = activeItems.findIndex((item : any)=>item.id === id);
-      const overIndex = overItems.findIndex((item : any)=>item.id === overId);
+      const activeIndex = activeItems.findIndex((item : Task)=>item.id === id);
+      const overIndex = overItems.findIndex((item : Task)=>item.id === overId);
       
       let newIndex;
       if (overId in prev) {
@@ -123,14 +137,14 @@ export default function Board() {
         [activeContainer]: {
             id : prev[activeContainer].id,
             name : prev[activeContainer].name,
-            items : [...prev[activeContainer].items.filter((item : any) => item.id !== active.id)]
+            items : [...prev[activeContainer].items!.filter((item : Task) => item.id !== active.id)]
         },
         [overContainer]: {
             id : prev[overContainer].id,
             name : prev[overContainer].name,
-            items : [...prev[overContainer].items.slice(0, newIndex),
-            items[activeContainer].items[activeIndex],
-            ...prev[overContainer].items.slice(newIndex, prev[overContainer].length)]
+            items : [...prev[overContainer].items!.slice(0, newIndex),
+            items[activeContainer].items![activeIndex],
+            ...prev[overContainer].items!.slice(newIndex, prev[overContainer].items!.length)]
         }
       };
     });
@@ -152,8 +166,8 @@ export default function Board() {
       return;
     }
 
-    const activeIndex = items[activeContainer].items.findIndex((item : any)=>item.id === active.id);
-    const overIndex = items[overContainer].items.findIndex((item : any)=>item.id === overId);
+    const activeIndex = items[activeContainer].items!.findIndex((item : Task)=>item.id === active.id);
+    const overIndex = items[overContainer].items!.findIndex((item : Task)=>item.id === overId);
 
     if (activeIndex !== overIndex) {
       setItems((items) => ({
@@ -161,7 +175,7 @@ export default function Board() {
         [overContainer]: {
             id : items[activeContainer].id,
             name : items[activeContainer].name,
-            items : arrayMove(items[overContainer].items, activeIndex, overIndex)
+            items : arrayMove(items[overContainer].items!, activeIndex, overIndex)
         }
       }));
     }

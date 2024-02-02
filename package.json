@@ -19,11 +19,8 @@
     "dexie": "^3.2.4",
     "dexie-react-hooks": "^1.1.7",
     "react": "^18.2.0",
-    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "react-virtualized": "^9.22.5",
-    "react-window": "^1.8.10",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },

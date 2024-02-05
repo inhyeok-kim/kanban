@@ -6,14 +6,16 @@ export class KanbanDatabase extends Dexie {
     tasks! : Table<Task>;
     config! : Table<Config>;
     workNote! : Table<WorkNote>;
+    todos! : Table<Todo>;
 
     constructor(){
         super('kanban');
-        this.version(0.3).stores({
+        this.version(0.5).stores({
             columns : '++id, name',
             tasks : '++id, columnId, title, order',
             workNote : '++id, taskId, date, content',
-            config : 'key, value'
+            config : 'key, value',
+            todos : '++id,taskId,title,isCheck',
         });
     }
 }
@@ -37,6 +39,13 @@ export interface WorkNote {
     taskId? : number | string | IndexableType
     content : string
     date : string
+}
+
+export interface Todo {
+    id? : number
+    taskId? : number | string | IndexableType
+    title : string
+    isCheck : boolean
 }
 
 export interface Config {

@@ -1,4 +1,4 @@
-import { Column, DB, Task, WorkNote } from "../../lib/db/db";
+import { Column, DB, Task, Todo, WorkNote } from "../../lib/db/db";
 
 export async function selectKanbanData(){
     const columns : Column[] = await DB.columns.toArray();
@@ -35,4 +35,21 @@ export async function selectWorkNote(taskId : number){
 
 export async function putWorkNote(workNote : WorkNote){
     await DB.workNote.put(workNote);
+}
+
+export async function deleteWorkNote(key : number){
+    await DB.workNote.delete(key);
+}
+
+export async function selectTodos(taskId : number){
+    const list = await DB.todos.filter(todo=>todo.taskId === taskId).toArray();
+    return list;
+}
+
+export async function putTodo(todo : Todo){
+    await DB.todos.put(todo);
+}
+
+export async function deleteTodo(key : number){
+    await DB.todos.delete(key);
 }

@@ -27,7 +27,7 @@ function App() {
         height={'calc(100% - 2rem)'}
         padding={2}
         sx={{
-          backgroundImage : "url(/bgimg2.jpg)",
+          backgroundImage : "url(/bgimg0.jpg)",
           backgroundSize: 'cover',
         }}
       >

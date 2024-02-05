@@ -27,6 +27,19 @@ DB.config.get('init',(config)=>{
       DB.columns.add({name : '진행'})
       DB.columns.add({name : '완료'})
       DB.columns.add({name : '중단'});
+      DB.columns.add({name : '백로그'});
+    } else {
+      if(config){
+        DB.config.get('version',(version)=>{
+          if(!version){
+            DB.config.add({key:'version',value:'0.4'});
+            DB.columns.add({name : '백로그'});
+          } else {
+            if(version.value === '0.4'){
+            }
+          }
+        })
+      }
     }
 });
 

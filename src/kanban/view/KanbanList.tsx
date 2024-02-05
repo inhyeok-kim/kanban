@@ -30,6 +30,7 @@ export default function KanbanList({
     return (
         <Stack
             width={250}
+            minWidth={250}
         >
             <Card
                 sx={{background : 'rgba(255,255,255,0.5)'}}

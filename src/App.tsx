@@ -1,14 +1,19 @@
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import KanbanBoard from "./kanban/view/KanbanBoard";
 import { Button, Stack } from "@mui/material";
 import { blueGrey } from "@mui/material/colors";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import Router from "./Router";
 
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(()=>{
+    if(location.pathname === '/') navigate('board');
+  },[]);
+
   return (
     <Grid2
-      sx={{
-        userSelect : 'none'
-      }}
       width={'100%'}
       height={'100vh'}
     >
@@ -18,20 +23,19 @@ function App() {
           bgcolor={blueGrey[300]}
           height={'2rem'}
         >
-          <Button sx={{color : "white"}}>Menu1</Button>
-          <Button sx={{color : "white"}}>Menu2</Button>
-          <Button sx={{color : "white"}}>Menu3</Button>
+          <Button sx={{color : "white"}} onClick={()=>{navigate('/board')}}>Board</Button>
+          <Button sx={{color : "white"}} onClick={()=>{navigate('/note')}}>Note</Button>
         </Stack>
       </Grid2>
       <Grid2
         height={'calc(100% - 2rem)'}
         padding={2}
         sx={{
-          backgroundImage : "url(/bgimg0.jpg)",
+          backgroundImage : "url(/bgimg2.jpg)",
           backgroundSize: 'cover',
         }}
       >
-        <KanbanBoard />
+        <Router />
       </Grid2>
     </Grid2>
   );

@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Card, CardActionArea, CardContent, CardHeader, Drawer, IconButton } from "@mui/material";
+import {  Card, CardActionArea, CardContent, CardHeader, IconButton } from "@mui/material";
 import { MouseEvent, useContext, useEffect } from "react";
 import { Task } from "../../lib/db/db";
 import CardTitle from "./CardTitle";

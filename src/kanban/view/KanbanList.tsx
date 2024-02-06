@@ -1,7 +1,7 @@
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import KanbanCard from "./KanbanCard"
 import { useDroppable } from "@dnd-kit/core";
-import { Button, Card, CardContent, CardHeader, Stack, Typography } from "@mui/material";
+import { Button, Card, CardContent, CardHeader, Stack } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { Column } from "../../lib/db/db";
 import { useContext } from "react";

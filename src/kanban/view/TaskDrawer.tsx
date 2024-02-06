@@ -1,6 +1,6 @@
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { Task, Todo, WorkNote } from "../../lib/db/db";
-import { Box, Button, Checkbox, Divider, FormControl, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControl, Stack, TextField, Typography } from "@mui/material";
 import { ChangeEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { deleteTodo, deleteWorkNote, putTodo, putWorkNote, selectTodos, selectWorkNote } from "../service/KanbanService";
 import { getToday } from "../../lib/utils";

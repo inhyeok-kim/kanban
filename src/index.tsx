@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { DB } from './lib/db/db';
+import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -43,7 +44,10 @@ DB.config.get('init',(config)=>{
     }
 });
 
+
 root.render(
+  <BrowserRouter basename='/'>
     <App />
+  </BrowserRouter>
 );
 

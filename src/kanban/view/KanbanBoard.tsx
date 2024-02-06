@@ -1,29 +1,28 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
   closestCorners,
-  KeyboardSensor,
   useSensor,
   useSensors,
   MouseSensor,
   DragOverEvent
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { arrayMove} from "@dnd-kit/sortable";
 
 import KanbanList from "./KanbanList";
 import KanbanCard from "./KanbanCard";
 import { Drawer, Stack } from "@mui/material";
-import { Column, DB, Task } from "../../lib/db/db";
+import { Column, Task } from "../../lib/db/db";
 import { createKanbanCard, selectKanbanData, reorderTask, deleteKanbanCard } from "../service/KanbanService";
 import TaskDrawer from "./TaskDrawer";
 
-export const BoardContext = createContext<BoardContext>({
+export const BoardContext = createContext<BoardContextType>({
   createNewCard : ()=>{},
   deleteCard : ()=>{},
   openDrawer : ()=>{}
 });
-export interface BoardContext {
+export interface BoardContextType {
   createNewCard : Function
   deleteCard : Function
   openDrawer : Function

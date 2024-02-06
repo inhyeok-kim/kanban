@@ -40,7 +40,8 @@ export default function CardTitle(props : CardTitleProps){
                         }}
                         value={value}
                         onChange={changeHandler}
-                        onClick={(e)=>{e.stopPropagation()}}
+                        onKeyDown={(e)=>{if(e.key === 'Enter') inputRef.current?.blur()}}
+                        onClick={(e)=>{e.stopPropagation();}}
                         inputProps={{
                             style : {
                                 fontSize : '11px',

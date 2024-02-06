@@ -49,9 +49,10 @@ export default function KanbanCard({
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <Card>
+            <Card
+            >
                 <CardActionArea
-                    onClick={()=>{boardContext.openDrawer(item)}}
+                    onClick={(e)=>{if(e.clientX===0 && e.clientY ===0) {return false;} boardContext.openDrawer(item)}}
                 >
                     <CardHeader
                         title={<CardTitle 

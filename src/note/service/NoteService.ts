@@ -1,5 +1,5 @@
 import { IndexableType } from "dexie";
-import { DB, WorkNote } from "../../lib/db/db";
+import { DB } from "../../lib/db/db";
 
 export async function selectWorkNoteByDate(date : string){
     const list = await DB.workNote.filter(note=>note.date === date).toArray();

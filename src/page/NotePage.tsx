@@ -60,7 +60,11 @@ export default function NotePage(){
                     }
                 />
                 <CardContent
-                    sx={{background : 'white'}}
+                    sx={{
+                        background : 'white',
+                        paddingLeft : 3,
+                        paddingRight : 3
+                    }}
                 >
                     {
                         Object.keys(dataMap)?.map(taskId=>{

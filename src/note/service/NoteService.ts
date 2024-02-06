@@ -6,6 +6,11 @@ export async function selectWorkNoteByDate(date : string){
     return list;
 }
 
+export async function selectWorkNoteByPeriod(from : string, to:string){
+    const list = await DB.workNote.filter(note=>note.date >= from && note.date <= to).toArray();
+    return list;
+}
+
 export async function selectOneTask(taskId : number|IndexableType){
     const task = await DB.tasks.get(taskId);
     return task;

@@ -12,6 +12,10 @@ export default function CardTitle(props : CardTitleProps){
     const inputRef = useRef<HTMLInputElement>();
 
     useEffect(()=>{
+        setValue(props.text);
+    },[props.text]);
+
+    useEffect(()=>{
         props.onChange(deferredValue);
     },[deferredValue]);
 

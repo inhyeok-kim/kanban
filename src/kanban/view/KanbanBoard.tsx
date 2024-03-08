@@ -103,7 +103,10 @@ export default function Board() {
       <Drawer
         anchor="right"
         open={drawerOpen}
-        onClose={()=>{setDrawerOpen(false)}}
+        onClose={()=>{
+          setDrawerOpen(false); 
+          loadBoardData();
+        }}
       >
         {drawerItem?
           <TaskDrawer item={drawerItem} />

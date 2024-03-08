@@ -1,4 +1,4 @@
-import { Column, DB, Task, Todo, WorkNote } from "../../lib/db/db";
+import { AttributeType, Column, DB, PROJECT_ATTRIBUTE, TYPE_ATTRIBUTE, Task, TaskAttribute, Todo, TypeAttribute, WorkNote } from "../../lib/db/db";
 
 export async function selectKanbanData(){
     const columns : Column[] = await DB.columns.toArray();
@@ -52,4 +52,36 @@ export async function putTodo(todo : Todo){
 
 export async function deleteTodo(key : number){
     await DB.todos.delete(key);
+}
+
+export async function selectProjectAttributes(){
+    const result = await DB.attributes.filter(attr=>attr.type === PROJECT_ATTRIBUTE).toArray();
+    return result;
+}
+
+export async function selectTypeAttributes(){
+    const result = await DB.attributes.filter(attr=>attr.type === TYPE_ATTRIBUTE).toArray();
+    return result;
+}
+
+export async function selectTaskAttributeOfTtype(taskId : number){
+    const taskAttributes = (await DB.taskAttribute.filter(at=>at.taskId === taskId).toArray()).map(at=>at.attributeId);
+    const list = await DB.attributes.filter(ta=>ta.type === TYPE_ATTRIBUTE && taskAttributes.indexOf(ta.id!)>-1).toArray();
+    const result = list.length > 0 ? list[0] : undefined
+    return result;
+}
+
+export async function selectTaskAttributeOfProject(taskId : number){
+    const taskAttributes = (await DB.taskAttribute.filter(at=>at.taskId === taskId).toArray()).map(at=>at.attributeId);
+    const list = await DB.attributes.filter(ta=>ta.type === PROJECT_ATTRIBUTE && taskAttributes.indexOf(ta.id!)>-1).toArray();
+    const result = list.length > 0 ? list[0] : undefined
+    return result;
+}
+
+export async function putTaskAttribute(item : TaskAttribute){
+    await DB.taskAttribute.put(item);
+}
+
+export async function removeTaskAttribute(taskId : number, atId : number){
+    await DB.taskAttribute.filter(ta=>ta.taskId===taskId && ta.attributeId === atId).delete();
 }

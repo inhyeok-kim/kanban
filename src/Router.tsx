@@ -4,7 +4,7 @@ import NotePage from "./page/NotePage";
 
 export default function Router(){
     return (
-        <Routes>
+      <Routes>
         <Route path="board" element={<BoardPage/>} />
         <Route path="note" element={<NotePage/>} />
       </Routes>

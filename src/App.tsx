@@ -29,6 +29,7 @@ function App() {
       </Grid2>
       <Grid2
         height={'calc(100% - 2rem)'}
+        overflow={'auto'}
         padding={2}
         sx={{
           backgroundImage : "url(/bgimg2.jpg)",

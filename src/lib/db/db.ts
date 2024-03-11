@@ -1,6 +1,6 @@
 import Dexie, { IndexableType, Table } from "dexie";
 
-const DB_VERSION = 0.6
+const DB_VERSION = 0.7
 
 export class KanbanDatabase extends Dexie {
 
@@ -15,7 +15,7 @@ export class KanbanDatabase extends Dexie {
     constructor(){
         super('kanban');
         this.version(DB_VERSION).stores({
-            columns : '++id, name',
+            columns : '++id, name, order',
             tasks : '++id, columnId, title, order',
             workNote : '++id, taskId, date, content',
             config : 'key, value',
@@ -32,6 +32,7 @@ export interface Column{
     id? : number
     name : string
     items? : Task[]
+    order? : number
 }
 
 export interface Task {
@@ -81,7 +82,7 @@ export function doDBSetting(){
     DB.config.get('init',(config)=>{
         if(!config){
           DB.config.add({key : 'init',value:"true"});
-          DB.columns.add({name : '대기'})
+          DB.columns.add({name : '대기', order : 1})
             .then(key=>{
               DB.tasks.add({
                 columnId : key,
@@ -94,22 +95,25 @@ export function doDBSetting(){
                   order : 1
                 })
               })
-            });
-          DB.columns.add({name : '진행'});
-          DB.columns.add({name : '완료'});
-          DB.columns.add({name : '지연'});
-          DB.columns.add({name : '취소'});
-          DB.columns.add({name : '백로그'});
+          });
+
+          DB.columns.add({name : 'Task Queue', order : 1});
+          DB.columns.add({name : 'Progress', order : 2});
+          DB.columns.add({name : 'Async', order : 3});
+          DB.columns.add({name : 'Hold', order : 4});
+          DB.columns.add({name : 'Done', order : 5});
+          DB.columns.add({name : 'Backlog', order : 6});
+
         } else {
           if(config){
             DB.config.get('version',(version)=>{
               if(!version){
-                DB.columns.add({name : '백로그'});
-                DB.columns.add({name : '지연'});
+                DB.columns.add({name : '백로그', order : 4});
+                DB.columns.add({name : '지연', order : 3});
                 DB.config.add({key:'version',value:`${DB_VERSION}`});
               } else {
                 if(version.value < '0.5'){
-                  DB.columns.filter((column)=>column.name === '중단').modify(column=>{column.name = '지연'});
+                  DB.columns.filter((column)=>column.name === '중단').modify(column=>{column.name = '지연'; column.order = 3});
                 }
                 if(version.value < '0.6'){
                     DB.attributes.add({name : '이슈', type : TYPE_ATTRIBUTE});
@@ -123,8 +127,16 @@ export function doDBSetting(){
                     DB.attributes.add({name : 'Atm', type : PROJECT_ATTRIBUTE});
                     DB.attributes.add({name : '기타', type : PROJECT_ATTRIBUTE});
                 }
+                if(version.value <'0.7'){
+                  DB.columns.filter((column)=>column.name === '대기').modify(column=>{column.name = 'Task Queue'; column.order = 1});
+                  DB.columns.filter((column)=>column.name === '진행').modify(column=>{column.name = 'Progress'; column.order = 2});
+                  DB.columns.filter((column)=>column.name === '지연').modify(column=>{column.name = 'Async'; column.order = 3});
+                  DB.columns.filter((column)=>column.name === '완료').modify(column=>{column.name = 'Done'; column.order = 5});
+                  DB.columns.filter((column)=>column.name === '백로그').modify(column=>{column.name = 'Backlog'; column.order = 6});
+                  DB.columns.add({name : 'Hold', order : 4});
+                }
                 if(version.value != `${DB_VERSION}`){
-                    DB.config.add({key:'version',value:`${DB_VERSION}`});
+                    DB.config.update('version',{value:`${DB_VERSION}`});
                 }
               }
             })

@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import RemoveIcon from '@mui/icons-material/Remove';
 import {  Card, CardActionArea, CardContent, CardHeader, Chip, IconButton, Stack } from "@mui/material";
 import { MouseEvent, useContext, useEffect, useState } from "react";
 import { Attributes, Task } from "../../lib/db/db";
@@ -69,7 +70,7 @@ export default function KanbanCard({
                         titleTypographyProps={{
                             style:{height:'20px'}
                         }}
-                        action={<IconButton size="small" onClick={deleteCard}>-</IconButton>}
+                        action={<IconButton size="small" onClick={deleteCard}><RemoveIcon fontSize="small" /></IconButton>}
                         sx={{paddingBottom:0, padding:1}}
                     />
                     <CardContent

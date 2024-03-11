@@ -1,7 +1,7 @@
 import { AttributeType, Column, DB, PROJECT_ATTRIBUTE, TYPE_ATTRIBUTE, Task, TaskAttribute, Todo, TypeAttribute, WorkNote } from "../../lib/db/db";
 
 export async function selectKanbanData(){
-    const columns : Column[] = await DB.columns.toArray();
+    const columns : Column[] = await DB.columns.orderBy('order').toArray();
     for(let i=0; i < columns.length; i++){
       const column = columns[i];
       const tasks = await DB.tasks.filter(task=>task.columnId === column.id).sortBy('order');

@@ -29,12 +29,13 @@ export default function NotePage(){
                     map[task.id!][1].push(note);
                 } else {
                     map[task.id!] = [task,[note]];
+                    if(pmap[project.id!]){
+                        pmap[project.id!][1].push(task);
+                    } else {
+                        pmap[project.id!] = [project,[task]];
+                    }
                 }
-                if(pmap[project.id!]){
-                    pmap[project.id!][1].push(task);
-                } else {
-                    pmap[project.id!] = [project,[task]];
-                }
+                
             }
         }
         setDataMap(map);

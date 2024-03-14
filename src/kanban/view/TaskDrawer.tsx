@@ -2,7 +2,7 @@ import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { AttributeType, Attributes, PROJECT_ATTRIBUTE, TYPE_ATTRIBUTE, Task, Todo, WorkNote } from "../../lib/db/db";
 import { Autocomplete, Box, Button, Checkbox, Chip, Divider, FormControl, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { ChangeEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { deleteTodo, deleteWorkNote, putTaskAttribute, putTodo, putWorkNote, removeTaskAttribute, selectProjectAttributes, selectTaskAttributeOfProject, selectTaskAttributeOfTtype, selectTodos, selectTypeAttributes, selectWorkNote, updateTitle } from "../service/KanbanService";
+import { deleteTodo, deleteWorkNote, putTaskAttribute, putTodo, putWorkNote, removeTaskAttribute, removeTaskAttributeOfProject, removeTaskAttributeOfType, selectProjectAttributes, selectTaskAttributeOfProject, selectTaskAttributeOfTtype, selectTodos, selectTypeAttributes, selectWorkNote, updateTitle } from "../service/KanbanService";
 import { getToday } from "../../lib/utils";
 import { grey } from "@mui/material/colors";
 
@@ -97,12 +97,12 @@ function AttributeForm(props:{taskId : number}){
 
     function fnChangeType(atr : Attributes |null){
         if(atr != null){
-            setTypeAttribute(atr)
+            setTypeAttribute(atr);
             putTaskAttribute({attributeId : atr.id!, taskId : props.taskId});
         } else {
             if(typeAttribute){
-                removeTaskAttribute(props.taskId,typeAttribute.id!)
-                setTypeAttribute(null)
+                removeTaskAttributeOfType(props.taskId);
+                setTypeAttribute(null);
             }
         }
         
@@ -113,8 +113,8 @@ function AttributeForm(props:{taskId : number}){
             putTaskAttribute({attributeId : atr.id!, taskId : props.taskId});
         } else {
             if(projectAttribute){
-                removeTaskAttribute(props.taskId,projectAttribute.id!)
-                setProjectAttribute(null)
+                removeTaskAttributeOfProject(props.taskId);
+                setProjectAttribute(null);
             }
         }
     }
@@ -189,6 +189,7 @@ function WorkNoteForm(props:WorkNoteProps){
     }
 
     function doCancel(){
+        setContent(props.item ? props.item.content : '');
         setIsEdit(false);
     }
 

@@ -85,3 +85,11 @@ export async function putTaskAttribute(item : TaskAttribute){
 export async function removeTaskAttribute(taskId : number, atId : number){
     await DB.taskAttribute.filter(ta=>ta.taskId===taskId && ta.attributeId === atId).delete();
 }
+export async function removeTaskAttributeOfType(taskId : number){
+    const tat = (await DB.attributes.filter(at=>at.type === TYPE_ATTRIBUTE).toArray()).map(v=>v.id);
+    await DB.taskAttribute.filter(ta=>ta.taskId===taskId && tat.includes(ta.attributeId)).delete();
+}
+export async function removeTaskAttributeOfProject(taskId : number){
+    const pat = (await DB.attributes.filter(at=>at.type === PROJECT_ATTRIBUTE).toArray()).map(v=>v.id);
+    await DB.taskAttribute.filter(ta=>ta.taskId===taskId && pat.includes(ta.attributeId)).delete();
+}

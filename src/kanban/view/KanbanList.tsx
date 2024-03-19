@@ -42,8 +42,12 @@ export default function KanbanList({
                     sx={{paddingBottom : 0, padding : 0.5}}
                 />
                 <CardContent
-
-                    sx={{paddingTop : 0, padding : 0.5, paddingBottom : '6px !important'}}
+                    sx={{
+                        paddingTop : 0, padding : 0.5, paddingBottom : '6px !important'
+                        , overflowY : "auto"
+                        , maxHeight : 'calc(100vh - 115px)'
+                    }}
+                    
                 >
                     <SortableContext
                         id={id}
